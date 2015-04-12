@@ -44,7 +44,7 @@ public class TweetsExtractor {
                     //System.out.println("@" + status.getUser().getScreenName() + ":" +  status.getText() + " ");
                     
                     if(!tweetListDate.isEmpty()){
-                        if(tweetListDate.get(tweetListDate.size()-1).date == status.getCreatedAt() ) { //Increment num of tweets for this date
+                        if(tweetListDate.get(tweetListDate.size()-1).date.getDay() == status.getCreatedAt().getDay() ) { //Increment num of tweets for this date
                             tweetListDate.get(tweetListDate.size() - 1).numOfTweets++;
                         } else {
                             TweetDate d = new TweetDate();
@@ -60,7 +60,7 @@ public class TweetsExtractor {
                     }
                 }
                 iter++;
-            } while ((query = result.nextQuery()) != null && iter < LIMIT);  //Set limit avoid exceeding the rate limit when 
+            } while ((query = result.nextQuery()) != null && iter < LIMIT);  //Set limit avoid exceeding the rate limit when requesting from the twitter API
             
             
             System.out.println("list size: " + tweetListDate.size());
