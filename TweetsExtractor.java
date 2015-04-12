@@ -29,6 +29,7 @@ public class TweetsExtractor {
     
     public void search(){
         int iter = 0;
+        int LIMIT = 180; //
         try {
             
             //Query query = new Query("@gunthermarder"); //referencing person “gunthermarder”.
@@ -59,7 +60,7 @@ public class TweetsExtractor {
                     }
                 }
                 iter++;
-            } while ((query = result.nextQuery()) != null && iter < 300);  //Set iter to a max limit to avoid exceeding the rate limit
+            } while ((query = result.nextQuery()) != null && iter < LIMIT);  //Set limit avoid exceeding the rate limit when 
             
             
             System.out.println("list size: " + tweetListDate.size());
