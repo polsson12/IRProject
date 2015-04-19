@@ -14,6 +14,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class TweetsExtractor {
@@ -44,7 +45,13 @@ public class TweetsExtractor {
                     //System.out.println("@" + status.getUser().getScreenName() + ":" +  status.getText() + " ");
                     
                     if(!tweetListDate.isEmpty()){
-                        if(tweetListDate.get(tweetListDate.size()-1).date.getDay() == status.getCreatedAt().getDay() ) { //Increment num of tweets for this date
+                        Calendar tweetCal = Calendar.getInstance();
+                        tweetCal.setTime(tweetListDate.get(tweetListDate.size()-1).date);
+
+                        Calendar statusCal = Calendar.getInstance();
+                        statusCal.setTime(status.getCreatedAt());
+
+                        if(tweetCal.get(Calendar.DAY_OF_MONTH) == statusCal.get(Calendar.DAY_OF_MONTH) ) { //Increment num of tweets for this date
                             tweetListDate.get(tweetListDate.size() - 1).numOfTweets++;
                         } else {
                             TweetDate d = new TweetDate();
