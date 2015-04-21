@@ -2,9 +2,14 @@
 /* 
  How to compile:
 <<<<<<< HEAD
+<<<<<<< HEAD
  javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java TweetDate.java
  java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
  
+=======
+ javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java
+ java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
+>>>>>>> origin/master
 =======
  javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java
  java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
@@ -26,9 +31,12 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
 
@@ -40,7 +48,10 @@ public class TweetsExtractor {
     Map<Double, Double> frequency = new TreeMap<Double, Double>();
     double minDateHour = Double.MAX_VALUE;
 <<<<<<< HEAD
+<<<<<<< HEAD
     ArrayList <Status> tweetsToFile = new ArrayList<Status>();
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
     
@@ -62,6 +73,7 @@ public class TweetsExtractor {
         
         return hour;
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
     
     /*
@@ -111,10 +123,15 @@ public class TweetsExtractor {
         int iter = 0;
         int LIMIT = 300; //
 =======
+=======
+>>>>>>> origin/master
     
     public void search(){
         int iter = 0;
         int LIMIT = 30; //
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
         try {
             
@@ -129,8 +146,11 @@ public class TweetsExtractor {
                     //System.out.println("@" + status.getUser().getScreenName() + ":" +  status.getText() + " ");
                     
 <<<<<<< HEAD
+<<<<<<< HEAD
                     tweetsToFile.add(status); //save it in the ArrayList to print all the tweets to a file in the end
                     
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
                 	double dateHour = getDateHour(status.getCreatedAt());
@@ -144,7 +164,10 @@ public class TweetsExtractor {
                 		frequency.put(dateHour, 1.0);
                 	
 <<<<<<< HEAD
+<<<<<<< HEAD
                     
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
                     /* This part works for frequency based on entire days
@@ -194,8 +217,11 @@ public class TweetsExtractor {
         TweetsExtractor s = new TweetsExtractor();
         s.search();
 <<<<<<< HEAD
+<<<<<<< HEAD
         s.writeTweetToFile();
         
+=======
+>>>>>>> origin/master
 =======
 >>>>>>> origin/master
 
@@ -220,6 +246,10 @@ public class TweetsExtractor {
             
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 =======
 
 >>>>>>> origin/master
