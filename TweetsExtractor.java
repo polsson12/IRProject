@@ -1,19 +1,8 @@
 
 /* 
  How to compile:
-<<<<<<< HEAD
-<<<<<<< HEAD
- javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java TweetDate.java
- java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
- 
-=======
  javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java
  java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
->>>>>>> origin/master
-=======
- javac -cp twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor.java FrequencyPlot.java
- java -cp .:twitter4j-core-4.0.3.jar:jmathplot.jar TweetsExtractor
->>>>>>> origin/master
  Note that it is assumed that the file twitter4j-core-4.0.3.jar is in the same folder as this file. If its not you have to specify
  the location of the twitter4j-core-4.0.3.jar
 */
@@ -30,15 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-<<<<<<< HEAD
-<<<<<<< HEAD
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
 
 
 public class TweetsExtractor {
@@ -47,13 +27,6 @@ public class TweetsExtractor {
     ArrayList<TweetDate> tweetListDate = new ArrayList<TweetDate>();
     Map<Double, Double> frequency = new TreeMap<Double, Double>();
     double minDateHour = Double.MAX_VALUE;
-<<<<<<< HEAD
-<<<<<<< HEAD
-    ArrayList <Status> tweetsToFile = new ArrayList<Status>();
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
     
 
 	public TweetsExtractor(){
@@ -73,68 +46,13 @@ public class TweetsExtractor {
         
         return hour;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    
-    /*
-     Writes the tweets collected from the search to the file specified in the.
-     The tweets are stored in the ArrayList "tweetsToFile" in which they are put during the paging of the search results
-     */
-    public void writeTweetToFile(){
-        try {
-            PrintWriter writer = new PrintWriter("#svpolTest1.txt", "UTF-8");
-            for(int i = 0; i < tweetsToFile.size(); i++){
-                Status s = tweetsToFile.get(i);
-                HashtagEntity [] hashtags = s.getHashtagEntities();
-                String hashtagsLine = "";
-                if(hashtags != null){
-                    for(int j = 0; j < hashtags.length;j++) {
-                        hashtagsLine += hashtags[j].getText() + " ";
-                    }
-                }
-                
-                
-                writer.println("Username:" + s.getUser().getScreenName() + " TweetText1:" + s.getText().replaceAll("\n", " ") + " TweetDate2:" +
-                               s.getCreatedAt() + " TweetId3:" + s.getId() + " RetweetCount4:" + s.getRetweetCount() + " TweetLang4:" +
-                               s.getLang() + " isRetweet5:" + s.isRetweeted() + " isTruncated5:" + s.isTruncated() + " geoLocation6:" +
-                               s.getGeoLocation() +
-                               " getFavoriteCount7:" + s.getFavoriteCount() + " hashtags8:" + hashtagsLine);
-            }
-            writer.close();
-        }
-        catch (FileNotFoundException fe){
-            System.out.println("Error when writing to file, file not found exception: \n + " + fe);
-        }
-        catch (UnsupportedEncodingException ee) {
-            System.out.println("Error when writing to file, unsupported encoding exception: \n + " + ee);
-        }
-        
-    }
-    
-    /*
-     //This needs to be used later to make sure that we don't download the same tweets twice
-    if(status.getId() < currentLowId)
-        currentLowId = status.getId();
-        query.setMaxId(currentLowId-1);
-     
-     */
-    
-    public void search(){
-        int iter = 0;
-        int LIMIT = 300; //
-=======
-=======
->>>>>>> origin/master
     
     public void search(){
         int iter = 0;
         int LIMIT = 30; //
-<<<<<<< HEAD
->>>>>>> origin/master
-=======
->>>>>>> origin/master
         try {
             
+            //Query query = new Query("@gunthermarder"); //referencing person “gunthermarder”.
             Query query = new Query("#svpol");
             query.setCount(100); //Specifies the maximum number of responses per page, (100 is max)
             QueryResult result;
@@ -145,14 +63,6 @@ public class TweetsExtractor {
                 for (Status status : result.getTweets()) {
                     //System.out.println("@" + status.getUser().getScreenName() + ":" +  status.getText() + " ");
                     
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    tweetsToFile.add(status); //save it in the ArrayList to print all the tweets to a file in the end
-                    
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
                 	double dateHour = getDateHour(status.getCreatedAt());
                 	
                 	if(dateHour < minDateHour)
@@ -163,13 +73,6 @@ public class TweetsExtractor {
                 	else
                 		frequency.put(dateHour, 1.0);
                 	
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
                     /* This part works for frequency based on entire days
                     if(!tweetListDate.isEmpty()){
                         Calendar tweetCal = Calendar.getInstance();
@@ -216,14 +119,6 @@ public class TweetsExtractor {
         
         TweetsExtractor s = new TweetsExtractor();
         s.search();
-<<<<<<< HEAD
-<<<<<<< HEAD
-        s.writeTweetToFile();
-        
-=======
->>>>>>> origin/master
-=======
->>>>>>> origin/master
 
         double[] x = new double[s.frequency.size()];
         double[] y = new double[s.frequency.size()];
@@ -245,18 +140,10 @@ public class TweetsExtractor {
             it.remove(); // avoids a ConcurrentModificationException
             
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
-=======
-
->>>>>>> origin/master
         FrequencyPlot plot = new FrequencyPlot(x, y);
         
     }
-    
 
 }
 		    
