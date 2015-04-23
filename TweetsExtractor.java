@@ -14,6 +14,7 @@ import twitter4j.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -32,11 +33,13 @@ public class TweetsExtractor {
     Map<Double, Double> frequency = new TreeMap<Double, Double>();
     double minDateHour = Double.MAX_VALUE;
     ArrayList <Status> tweetsToFile = new ArrayList<Status>();
+    final static String searchString = "#svpol";
     
     
     
-    public TweetsExtractor(){
+    public TweetsExtractor() {
         twitter = TwitterFactory.getSingleton();
+        System.out.println(twitter.users());
     }
     
     /**
@@ -59,7 +62,7 @@ public class TweetsExtractor {
      */
     public void writeTweetToFile(){
         try {
-            PrintWriter writer = new PrintWriter("#svpolTest1.txt", "UTF-8");
+            PrintWriter writer = new PrintWriter(searchString + ".txt", "UTF-8");
             for(int i = 0; i < tweetsToFile.size(); i++){
                 Status s = tweetsToFile.get(i);
                 HashtagEntity [] hashtags = s.getHashtagEntities();
@@ -70,12 +73,10 @@ public class TweetsExtractor {
                     }
                 }
                 
-                
                 writer.println("Username:" + s.getUser().getScreenName() + " TweetText1:" + s.getText().replaceAll("\n", " ") + " TweetDate2:" +
-                               s.getCreatedAt() + " TweetId3:" + s.getId() + " RetweetCount4:" + s.getRetweetCount() + " TweetLang4:" +
+                               s.getCreatedAt().toString() + " TweetId3:" + s.getId() + " RetweetCount4:" + s.getRetweetCount() + " TweetLang4:" +
                                s.getLang() + " isRetweet5:" + s.isRetweeted() + " isTruncated5:" + s.isTruncated() + " geoLocation6:" +
-                               s.getGeoLocation() +
-                               " getFavoriteCount7:" + s.getFavoriteCount() + " hashtags8:" + hashtagsLine);
+                               s.getGeoLocation() + " getFavoriteCount7:" + s.getFavoriteCount() + " hashtags8:" + hashtagsLine);
             }
             writer.close();
         }
@@ -99,13 +100,33 @@ public class TweetsExtractor {
     
     public void search(){
         int iter = 0;
-        int LIMIT = 30; //
+        int LIMIT = 1; //
+        long currentLowId = Long.MAX_VALUE;
+        
+
         try {
+            //	This returns all the various rate limits in effect for us with the Twitter API
+            Map<String, RateLimitStatus> rateLimitStatus = twitter.getRateLimitStatus("search");
+            //	This finds the rate limit specifically for doing the search API call we use in this program
+            RateLimitStatus searchTweetsRateLimit = rateLimitStatus.get("/search/tweets");
             
-            Query query = new Query("#svpol");
+            Query query = new Query(searchString);
             query.setCount(100); //Specifies the maximum number of responses per page, (100 is max)
             QueryResult result;
             do {
+                if (searchTweetsRateLimit.getRemaining() == 0) {
+                    try {
+                        System.out.println("Sleeps for the time remaining + 5 secs until we can fetch new tweets");
+                        Thread.sleep((searchTweetsRateLimit.getSecondsUntilReset()+5) * 1000l);
+                    }
+                    catch (InterruptedException ie) {
+                        System.out.println("Exception caught in try/catch sleep");
+                        Thread.currentThread().interrupt();
+                    }
+                    
+                }
+                
+                
                 result = twitter.search(query);
                 //System.out.println("Result size: " + result.getCount());
                 
@@ -124,6 +145,12 @@ public class TweetsExtractor {
                         frequency.put(dateHour, frequency.get(dateHour) + 1.0);
                     else
                         frequency.put(dateHour, 1.0);
+                    
+                    
+                    
+                     if(status.getId() < currentLowId)
+                        currentLowId = status.getId();
+                    
                     
                     /* This part works for frequency based on entire days
                      if(!tweetListDate.isEmpty()){
@@ -148,8 +175,13 @@ public class TweetsExtractor {
                      */
                 }
                 iter++;
-            } while ((query = result.nextQuery()) != null && iter < LIMIT);  //Set limit avoid exceeding the rate limit when requesting from the twitter API
+                query.setMaxId(currentLowId-1);
+                System.out.println("Has next: " + result.hasNext());
+                searchTweetsRateLimit = result.getRateLimitStatus();
+            } while ((query = result.nextQuery()) != null); //&& iter < LIMIT);  //Set limit avoid exceeding the rate limit when requesting from the twitter API
             
+            
+            System.out.println("tweets to file to size: " + tweetsToFile.size());
             /*
              System.out.println("list size: " + tweetListDate.size());
              for (int i = 0; i < tweetListDate.size(); i++)
@@ -168,9 +200,10 @@ public class TweetsExtractor {
     public static void main(String[] args) {
         
         TweetsExtractor s = new TweetsExtractor();
+        
+        
         s.search();
         s.writeTweetToFile();
-        
         
         double[] x = new double[s.frequency.size()];
         double[] y = new double[s.frequency.size()];
@@ -195,6 +228,5 @@ public class TweetsExtractor {
         FrequencyPlot plot = new FrequencyPlot(x, y);
         
     }
-    
     
 }
