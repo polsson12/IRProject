@@ -11,15 +11,8 @@
 
 import twitter4j.*;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +26,10 @@ public class TweetsExtractor {
     Map<Double, Double> frequency = new TreeMap<Double, Double>();
     double minDateHour = Double.MAX_VALUE;
     ArrayList <Status> tweetsToFile = new ArrayList<Status>();
-    final static String searchString = "#svpol";
+    //final static String searchString = "#FSOE3";
+    static String searchString = "#FSOE3";
+    HashMap<String,Double> tagAppearances = new HashMap<String,Double>();
+    double tweetsRetrieved = 0;
     
     
     
@@ -41,7 +37,11 @@ public class TweetsExtractor {
         twitter = TwitterFactory.getSingleton();
         System.out.println(twitter.users());
     }
-    
+
+    public void changeSearchString(String newSearchString) {
+        searchString = newSearchString;
+    }
+
     /**
      * Returns this Date's time value in hours.
      * Need to normalize later
@@ -128,12 +128,25 @@ public class TweetsExtractor {
                 
                 
                 result = twitter.search(query);
+                tweetsRetrieved += result.getTweets().size();
                 //System.out.println("Result size: " + result.getCount());
                 
                 for (Status status : result.getTweets()) {
                     //System.out.println("@" + status.getUser().getScreenName() + ":" +  status.getText() + " ");
                     
                     tweetsToFile.add(status); //save it in the ArrayList to print all the tweets to a file in the end
+
+                    String searchWOHash = searchString.substring(1);
+                    for(HashtagEntity hashtag : status.getHashtagEntities()) {
+                        String hashStr = hashtag.getText();
+                        if (!hashStr.equals(searchWOHash)) {
+                            if (tagAppearances.get(hashStr) == null) {
+                                tagAppearances.put(hashStr, 1.0);
+                            } else {
+                                tagAppearances.put(hashStr, tagAppearances.get(hashStr) + 1);
+                            }
+                        }
+                    }
                     
                     
                     double dateHour = getDateHour(status.getCreatedAt());
@@ -175,7 +188,7 @@ public class TweetsExtractor {
                      */
                 }
                 iter++;
-                query.setMaxId(currentLowId-1);
+                query.setMaxId(currentLowId - 1);
                 System.out.println("Has next: " + result.hasNext());
                 searchTweetsRateLimit = result.getRateLimitStatus();
             } while ((query = result.nextQuery()) != null); //&& iter < LIMIT);  //Set limit avoid exceeding the rate limit when requesting from the twitter API
@@ -193,6 +206,29 @@ public class TweetsExtractor {
         }
         
     }
+
+    public String mostPopularHashtag() {
+        double maxValueInMap = (Collections.max(tagAppearances.values()));
+        String maxHashtag = null;
+        for (Map.Entry<String,Double> entry : tagAppearances.entrySet()) {  // Iterate through hashmap
+            if (entry.getValue() == maxValueInMap) {
+                maxHashtag = entry.getKey();     // Print the key with max value
+            }
+        }
+
+        double rate = maxValueInMap/tweetsRetrieved;
+
+        System.out.println("Number of tweets: "+tweetsRetrieved);
+        System.out.println("Hashtag which more appearances after the searched one: "+maxHashtag);
+        System.out.println("Number of appearances: "+maxValueInMap);
+        System.out.println("Rate: "+rate);
+
+        if (rate>0.8) {
+            return "#"+maxHashtag;
+        } else {
+            return null;
+        }
+    }
     
     
     
@@ -200,10 +236,11 @@ public class TweetsExtractor {
     public static void main(String[] args) {
         
         TweetsExtractor s = new TweetsExtractor();
-        
+        String relatedHashtag;
         
         s.search();
         s.writeTweetToFile();
+        relatedHashtag = s.mostPopularHashtag();
         
         double[] x = new double[s.frequency.size()];
         double[] y = new double[s.frequency.size()];
@@ -215,8 +252,8 @@ public class TweetsExtractor {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             
-            x[i] = (double) pair.getKey() - s.minDateHour;
-            y[i] = (double) pair.getValue();
+            x[i] = (Double) pair.getKey() - s.minDateHour;
+            y[i] = (Double) pair.getValue();
             
             
             //System.out.println("x: " + x[i] + ", y: " + y[i]);
@@ -226,6 +263,27 @@ public class TweetsExtractor {
             
         }
         FrequencyPlot plot = new FrequencyPlot(x, y);
+
+
+
+        if(relatedHashtag!=null) {
+            s.changeSearchString(relatedHashtag);
+
+            s.search();
+            s.writeTweetToFile();
+            double[] w = new double[s.frequency.size()];
+            double[] z = new double[s.frequency.size()];
+            it = s.frequency.entrySet().iterator();
+            i = 0;
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                w[i] = (Double) pair.getKey() - s.minDateHour;
+                z[i] = (Double) pair.getValue();
+                i++;
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+            FrequencyPlot plotRelated = new FrequencyPlot(w, z);
+        }
         
     }
     
