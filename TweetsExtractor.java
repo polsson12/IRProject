@@ -26,8 +26,8 @@ public class TweetsExtractor {
     Map<Double, Double> frequency = new TreeMap<Double, Double>();
     double minDateHour = Double.MAX_VALUE;
     ArrayList <Status> tweetsToFile = new ArrayList<Status>();
-    //final static String searchString = "#FSOE3";
-    static String searchString = "#FSOE3";
+    //final static String searchString = "#earthquakeNepal";
+    static String searchString = "#Valborg";
     HashMap<String,Double> tagAppearances = new HashMap<String,Double>();
     double tweetsRetrieved = 0;
     
@@ -136,10 +136,10 @@ public class TweetsExtractor {
                     
                     tweetsToFile.add(status); //save it in the ArrayList to print all the tweets to a file in the end
 
-                    String searchWOHash = searchString.substring(1);
+                    String searchWOHash = searchString.substring(1).toLowerCase();
                     for(HashtagEntity hashtag : status.getHashtagEntities()) {
                         String hashStr = hashtag.getText();
-                        if (!hashStr.equals(searchWOHash)) {
+                        if (!hashStr.toLowerCase().equals(searchWOHash)) {
                             if (tagAppearances.get(hashStr) == null) {
                                 tagAppearances.put(hashStr, 1.0);
                             } else {
@@ -208,23 +208,27 @@ public class TweetsExtractor {
     }
 
     public String mostPopularHashtag() {
-        double maxValueInMap = (Collections.max(tagAppearances.values()));
-        String maxHashtag = null;
-        for (Map.Entry<String,Double> entry : tagAppearances.entrySet()) {  // Iterate through hashmap
-            if (entry.getValue() == maxValueInMap) {
-                maxHashtag = entry.getKey();     // Print the key with max value
+        if (!tagAppearances.isEmpty()) {
+            double maxValueInMap = (Collections.max(tagAppearances.values()));
+            String maxHashtag = null;
+            for (Map.Entry<String, Double> entry : tagAppearances.entrySet()) {  // Iterate through hashmap
+                if (entry.getValue() == maxValueInMap) {
+                    maxHashtag = entry.getKey();     // Print the key with max value
+                }
             }
-        }
 
-        double rate = maxValueInMap/tweetsRetrieved;
+            double rate = maxValueInMap / tweetsRetrieved;
 
-        System.out.println("Number of tweets: "+tweetsRetrieved);
-        System.out.println("Hashtag which more appearances after the searched one: "+maxHashtag);
-        System.out.println("Number of appearances: "+maxValueInMap);
-        System.out.println("Rate: "+rate);
+            System.out.println("Number of tweets: " + tweetsRetrieved);
+            System.out.println("Hashtag which more appearances after the searched one: " + maxHashtag);
+            System.out.println("Number of appearances: " + maxValueInMap);
+            System.out.println("Rate: " + rate);
 
-        if (rate>0.8) {
-            return "#"+maxHashtag;
+            if (rate > 0.8) {
+                return "#" + maxHashtag;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -262,7 +266,9 @@ public class TweetsExtractor {
             it.remove(); // avoids a ConcurrentModificationException
             
         }
-        FrequencyPlot plot = new FrequencyPlot(x, y);
+        if (x.length!=0 && y.length!=0) {
+            FrequencyPlot plot = new FrequencyPlot(x, y);
+        }
 
 
 
