@@ -59,14 +59,19 @@ final public class ParseTweetsFile {
         
         try {
 			PrintWriter writer = new PrintWriter("results_" + filename, "UTF-8");
+			PrintWriter writer1 = new PrintWriter("results_date_" + filename, "UTF-8");
 			
 	        while (it.hasNext()) {
 	        	Map.Entry pair = (Map.Entry)it.next();
+	        	//System.out.println();
+	        	Date date= new Date((long) ((double)pair.getKey() * 3600 * 1000));
 	        	
 	        	writer.println(pair.getKey() + " " + pair.getValue());
+	        	writer1.println(date + "-" + pair.getValue());
 	        }
 	        
 	        writer.close();
+	        writer1.close();
 			
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -113,15 +118,17 @@ final public class ParseTweetsFile {
     private double getDateHour(Date date) {
         Calendar tweetCal = Calendar.getInstance();
         tweetCal.setTime(date);
+       
         
         long seconds = tweetCal.getTimeInMillis()/1000;
-        
+       // System.out.println(Math.floor(seconds/3600));
         return Math.floor(seconds/3600);
+        
     }
 	
 	public static void main(String[] args)
 	{
-		String filename = "#championsLeague.txt";
+		String filename = "#earthquakeNepal.txt";
 		new ParseTweetsFile(filename);
 	}
 
