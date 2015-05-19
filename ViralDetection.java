@@ -15,7 +15,7 @@ import java.util.Locale;
 public class ViralDetection {
 
     public static void main(String args[]) {
-        String filename = "results_" + args[0];
+        String filename = args[0];
         normaliseFrequency(filename);
     }
 
@@ -39,11 +39,11 @@ public class ViralDetection {
     private static void normaliseFrequency(String filename) {
         try {
             // Get the starting time of the event, needs to be put in manually
-            String dateStr = "Thu Apr 23 20:00:00 CEST 2015";
+            /*String dateStr = "Tue Apr 21 20:45:00 CEST 2015";
             SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.ENGLISH);
             Date date = formatter.parse(dateStr);
 
-            double startTime = getDateHour(date);
+            double startTime = getDateHour(date);*/
 
             // Prepare the graph plot
             ViralFrequencyPlot plot = new ViralFrequencyPlot();
@@ -56,6 +56,10 @@ public class ViralDetection {
             Map<Double, Double> inputData = new TreeMap<Double, Double>();
             
             double totalTweets = 0;
+
+            boolean viralityFound = false;
+
+            double startTime = Double.parseDouble(line.split(" ")[0]); // Get the first value in set as start time
 
             while (line != null) {
                 tweetDateFreq = line.split(" ");
@@ -74,15 +78,25 @@ public class ViralDetection {
                 int i = 0;
 
                 double prevValue = 0;
-                double increase = 0;
 
                 for(Map.Entry<Double, Double> entry : inputData.entrySet()) {
 
-                    if (prevValue > 5 && entry.getValue() / prevValue > 1.5) System.out.println("Trending at " + entry.getKey());
+                    if(j == 1 && !viralityFound) { // Detect virality
+                        /* Virality is not predicted within the first 20 values of the 
+                        set since those are needed to calibrate the detection.
+                            Virality is then defined as when a value in the normalized set is 
+                        50% bigger than the previous value.*/
+                        if (i > 20 && entry.getValue() / prevValue > 1.5) {
+                            System.out.println("Trending at t " + entry.getKey() + " hours");
+                            viralityFound = true;
+                        }
+                    }
+
                     prevValue = entry.getValue();
 
                     hours[i] = entry.getKey();
                     freqs[i] = entry.getValue();
+
                     i++;
                 }
 
@@ -95,9 +109,9 @@ public class ViralDetection {
             System.out.println("File doesnt exist");
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
+        }/* catch (ParseException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**
